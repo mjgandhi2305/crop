@@ -65,31 +65,28 @@ def main():
 
     st.header("Enter the required values:")
 
-    # Create a form
-    with st.form(key="input_form"):
-        # Form fields
-        N = st.number_input("Nitrogen (N)", min_value=0, value=0, step=1)
-        P = st.number_input("Phosphorus (P)", min_value=0, value=0, step=1)
-        K = st.number_input("Potassium (K)", min_value=0, value=0, step=1)
-        # temperature = st.number_input("Temperature (°C)", value=0.0, format="%.2f")
-        # humidity = st.number_input("Humidity (%)", value=0.0, format="%.2f")
-        ph = st.number_input("pH", value=0.0, format="%.2f")
-        rainfall = st.number_input("Rainfall (mm)", value=0.0, format="%.2f")
-        state = st.selectbox("Select State", options=list(state_city_mapping.keys()))
-        # Select City based on the selected state
-        if state:
-            city = st.selectbox("Select City", options=state_city_mapping[state])
+    # Input fields
+    N = st.number_input("Nitrogen (N)", min_value=0, value=0, step=1)
+    P = st.number_input("Phosphorus (P)", min_value=0, value=0, step=1)
+    K = st.number_input("Potassium (K)", min_value=0, value=0, step=1)
+    ph = st.number_input("pH", value=0.0, format="%.2f")
+    rainfall = st.number_input("Rainfall (mm)", value=0.0, format="%.2f")
+    # Select State and City outside the form for dynamic updates
+    state = st.selectbox("Select State", options=list(state_city_mapping.keys()))
 
-        # Submit button for the form
-        submit_button = st.form_submit_button(label="Predict Crop")
+    if state:
+        city = st.selectbox("Select City", options=state_city_mapping[state])
 
-    if submit_button:
-        # Handle the form submission here (e.g., prediction logic)
-        temperature, humidity = weather_fetch(city)
-        data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
-        prediction = RF.predict(data)
-        print(prediction)
-        st.write(prediction)
+    # Submit button
+    if st.button("Predict Crop"):
+        if city:
+            temperature, humidity = weather_fetch(city)
+            data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
+            prediction = RF.predict(data)
+            st.write(f"Temperature: {temperature}, Humidity: {humidity}")
+            st.write(f"Predicted Crop: {prediction[0]}")
+        else:
+            st.write("Please select a city.")
 
 if __name__ == "__main__":
     main()
